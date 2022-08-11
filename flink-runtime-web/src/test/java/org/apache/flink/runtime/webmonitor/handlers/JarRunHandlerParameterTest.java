@@ -52,6 +52,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -177,6 +178,7 @@ class JarRunHandlerParameterTest
 
     @Override
     JarRunRequestBody getJarRequestBody(ProgramArgsParType programArgsParType) {
+        HashMap<String,String> flinkConfiguration = new HashMap<>(2);
         return new JarRunRequestBody(
                 ParameterProgram.class.getCanonicalName(),
                 getProgramArgsString(programArgsParType),
@@ -185,12 +187,13 @@ class JarRunHandlerParameterTest
                 null,
                 ALLOW_NON_RESTORED_STATE_QUERY,
                 RESTORE_PATH,
-                RestoreMode.CLAIM);
+                RestoreMode.CLAIM,
+                flinkConfiguration);
     }
 
     @Override
     JarRunRequestBody getJarRequestBodyWithJobId(JobID jobId) {
-        return new JarRunRequestBody(null, null, null, null, jobId, null, null, null);
+        return new JarRunRequestBody(null, null, null, null, jobId, null, null, null, null);
     }
 
     @Test

@@ -19,10 +19,12 @@
 package org.apache.flink.runtime.webmonitor.handlers;
 
 import org.apache.flink.api.common.JobID;
+import org.apache.flink.configuration.CoreOptions;
 import org.apache.flink.runtime.jobgraph.RestoreMode;
 import org.apache.flink.runtime.rest.messages.RestRequestMarshallingTestBase;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,6 +38,8 @@ public class JarRunRequestBodyTest extends RestRequestMarshallingTestBase<JarRun
 
     @Override
     protected JarRunRequestBody getTestRequestInstance() {
+        HashMap<String,String> flinkConfiguration = new HashMap<>(2);
+        flinkConfiguration.put(CoreOptions.DEFAULT_PARALLELISM.key(),"2");
         return new JarRunRequestBody(
                 "hello",
                 "world",
@@ -44,7 +48,8 @@ public class JarRunRequestBodyTest extends RestRequestMarshallingTestBase<JarRun
                 new JobID(),
                 true,
                 "foo/bar",
-                RestoreMode.CLAIM);
+                RestoreMode.CLAIM,
+                flinkConfiguration);
     }
 
     @Override
@@ -59,5 +64,6 @@ public class JarRunRequestBodyTest extends RestRequestMarshallingTestBase<JarRun
                 .isEqualTo(expected.getAllowNonRestoredState());
         assertThat(actual.getSavepointPath()).isEqualTo(expected.getSavepointPath());
         assertThat(actual.getRestoreMode()).isEqualTo(expected.getRestoreMode());
+        assertThat(actual.getFlinkConfiguration().get(CoreOptions.DEFAULT_PARALLELISM.key())).isNotEqualTo(expected.getParallelism());
     }
 }

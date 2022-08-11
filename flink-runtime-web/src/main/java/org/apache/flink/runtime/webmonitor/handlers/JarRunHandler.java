@@ -32,6 +32,7 @@ import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings;
 import org.apache.flink.runtime.rest.handler.AbstractRestHandler;
 import org.apache.flink.runtime.rest.handler.HandlerRequest;
 import org.apache.flink.runtime.rest.handler.RestHandlerException;
+import org.apache.flink.runtime.rest.handler.util.HandlerRequestUtils;
 import org.apache.flink.runtime.rest.messages.MessageHeaders;
 import org.apache.flink.runtime.webmonitor.handlers.utils.JarHandlerUtils.JarHandlerContext;
 import org.apache.flink.runtime.webmonitor.retriever.GatewayRetriever;
@@ -92,7 +93,16 @@ public class JarRunHandler
             @Nonnull final DispatcherGateway gateway)
             throws RestHandlerException {
 
-        final Configuration effectiveConfiguration = new Configuration(configuration);
+        Map<String, String> requestJobFlinkConfig =
+                HandlerRequestUtils.fromRequestBodyOrQueryParameter((request.getRequestBody()).getFlinkConfiguration(), () -> null, null, this.log);
+        Configuration effectiveConfiguration;
+        if (requestJobFlinkConfig != null) {
+            effectiveConfiguration = new Configuration();
+            requestJobFlinkConfig.forEach(effectiveConfiguration::setString);
+        } else {
+            effectiveConfiguration = new Configuration(this.configuration);
+        }
+
         effectiveConfiguration.set(DeploymentOptions.ATTACHED, false);
         effectiveConfiguration.set(DeploymentOptions.TARGET, EmbeddedExecutor.NAME);
 

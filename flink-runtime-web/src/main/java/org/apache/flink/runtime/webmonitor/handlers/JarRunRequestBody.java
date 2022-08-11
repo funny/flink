@@ -30,6 +30,7 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonPro
 import javax.annotation.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
 /** {@link RequestBody} for running a jar. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -37,6 +38,8 @@ public class JarRunRequestBody extends JarRequestBody {
     private static final String FIELD_NAME_ALLOW_NON_RESTORED_STATE = "allowNonRestoredState";
     private static final String FIELD_NAME_SAVEPOINT_PATH = "savepointPath";
     private static final String FIELD_NAME_SAVEPOINT_RESTORE_MODE = "restoreMode";
+
+    private static final String FIELD_NAME_FLINK_CONFIGURATION = "flinkConfiguration";
 
     @JsonProperty(FIELD_NAME_ALLOW_NON_RESTORED_STATE)
     @Nullable
@@ -50,8 +53,12 @@ public class JarRunRequestBody extends JarRequestBody {
     @Nullable
     private RestoreMode restoreMode;
 
+    @JsonProperty(FIELD_NAME_FLINK_CONFIGURATION)
+    @Nullable
+    private Map<String, String> flinkConfiguration;
+
     public JarRunRequestBody() {
-        this(null, null, null, null, null, null, null, null);
+        this(null, null, null, null, null, null, null, null, null);
     }
 
     @JsonCreator
@@ -65,11 +72,13 @@ public class JarRunRequestBody extends JarRequestBody {
             @Nullable @JsonProperty(FIELD_NAME_ALLOW_NON_RESTORED_STATE)
                     Boolean allowNonRestoredState,
             @Nullable @JsonProperty(FIELD_NAME_SAVEPOINT_PATH) String savepointPath,
-            @Nullable @JsonProperty(FIELD_NAME_SAVEPOINT_RESTORE_MODE) RestoreMode restoreMode) {
+            @Nullable @JsonProperty(FIELD_NAME_SAVEPOINT_RESTORE_MODE) RestoreMode restoreMode,
+            @Nullable @JsonProperty(FIELD_NAME_FLINK_CONFIGURATION) Map<String, String> flinkConfiguration) {
         super(entryClassName, programArguments, programArgumentsList, parallelism, jobId);
         this.allowNonRestoredState = allowNonRestoredState;
         this.savepointPath = savepointPath;
         this.restoreMode = restoreMode;
+        this.flinkConfiguration = flinkConfiguration;
     }
 
     @Nullable
@@ -88,5 +97,11 @@ public class JarRunRequestBody extends JarRequestBody {
     @JsonIgnore
     public RestoreMode getRestoreMode() {
         return restoreMode;
+    }
+
+    @Nullable
+    @JsonIgnore
+    public Map<String, String> getFlinkConfiguration() {
+        return flinkConfiguration;
     }
 }
